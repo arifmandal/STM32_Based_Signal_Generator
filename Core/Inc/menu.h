@@ -12,6 +12,7 @@
 #include "ssd1306_conf.h"
 #include "ssd1306.h"
 #include "ssd1306_fonts.h"
+#include "stdio.h"
 
 
 #define MAIN_MENU_ITEM_COUNT    3
@@ -20,4 +21,6 @@
 void printMenuItems(uint8_t menuCount);
 void handleMenuNavigation(void);
 void setFrequency(void);
+void setDutyCycle(void);
+void showAbout(void);
 #endif /* INC_MENU_H_ */
