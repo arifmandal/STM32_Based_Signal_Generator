@@ -7,9 +7,14 @@
 
 #include "menu.h"
 
+extern TIM_HandleTypeDef htim4;
+
 char *main_menu_items[] = { "-> Set Frequency", "-> Set DutyCycle", "-> About" };
 uint8_t selectedMenuItem = 0;
 uint32_t encoderValue = 0;
+uint32_t frequency = 0;
+uint32_t dutyCycle = 0;
+uint8_t onoffFlag = 1;
 
 void printMenuItems(uint8_t menuCount) {
 
@@ -34,7 +39,7 @@ void printMenuItems(uint8_t menuCount) {
 void handleMenuNavigation() {
 
 	printMenuItems(MAIN_MENU_ITEM_COUNT);
-	HAL_Delay(150);
+	HAL_Delay(50);
 
 	encoderValue = (TIM1->CNT) >> 3;
 	selectedMenuItem = encoderValue % MAIN_MENU_ITEM_COUNT;
@@ -88,12 +93,29 @@ void handleMenuNavigation() {
 
 	}
 
+	if (ONOFF_CLICK) {
+
+		if (!onoffFlag) {
+			HAL_GPIO_WritePin(output_OFF_GPIO_Port, output_OFF_Pin, 1);
+			HAL_GPIO_WritePin(output_ON_GPIO_Port, output_ON_Pin, 0);
+			pwmChannelStop(&htim4, TIM_CHANNEL_1);
+			onoffFlag = 1;
+		} else {
+			HAL_GPIO_WritePin(output_OFF_GPIO_Port, output_OFF_Pin, 0);
+			HAL_GPIO_WritePin(output_ON_GPIO_Port, output_ON_Pin, 1);
+			setPWMFreqDuty(frequency, dutyCycle);
+			pwmChannelStart(&htim4, TIM_CHANNEL_1);
+			onoffFlag = 0;
+		}
+
+	}
+
 }
 
 void setFrequency() {
 
 	char buffer[20];
-	uint32_t frequency = 0;
+	frequency = 0;
 	frequency = (TIM1->CNT) >> 1;
 	frequency *= 100;
 	if (frequency >= 1000000) {
@@ -101,14 +123,16 @@ void setFrequency() {
 	}
 	sprintf(buffer, "%ld", frequency);
 	ssd1306_Fill(Black);
-	ssd1306_SetCursor(10, 10);
+	ssd1306_SetCursor(30, 10);
+	ssd1306_WriteString("Frequency", Font_7x10, White);
+	ssd1306_SetCursor(50, 30);
 	ssd1306_WriteString(buffer, Font_7x10, White);
 	ssd1306_UpdateScreen();
 }
 
 void setDutyCycle() {
 	char buffer[20];
-	uint32_t dutyCycle = 0;
+	dutyCycle = 0;
 	dutyCycle = (TIM1->CNT) >> 1;
 	dutyCycle *= 5;
 	if (dutyCycle >= 100) {
@@ -116,7 +140,9 @@ void setDutyCycle() {
 	}
 	sprintf(buffer, "%ld", dutyCycle);
 	ssd1306_Fill(Black);
-	ssd1306_SetCursor(10, 10);
+	ssd1306_SetCursor(30, 10);
+	ssd1306_WriteString("Duty Cycle", Font_7x10, White);
+	ssd1306_SetCursor(50, 30);
 	ssd1306_WriteString(buffer, Font_7x10, White);
 	ssd1306_UpdateScreen();
 

@@ -48,8 +48,8 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
-float frequency = 1000;
-float dutyCycle = 50;
+//float frequency = 1000;
+//float dutyCycle = 50;
 
 
 /* USER CODE END PV */
@@ -104,9 +104,12 @@ int main(void)
 
 
   pwmChannelStart(&htim4, TIM_CHANNEL_1);
-  setPWMFreqDuty(frequency, dutyCycle);
+  setPWMFreqDuty(1000, 50);
   ssd1306_Init();
   HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
+  HAL_GPIO_WritePin(output_OFF_GPIO_Port, output_OFF_Pin, 1);
+  HAL_GPIO_WritePin(output_ON_GPIO_Port, output_ON_Pin, 0);
+  pwmChannelStop(&htim4, TIM_CHANNEL_1);
 
 
   /* USER CODE END 2 */
@@ -325,16 +328,32 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, output_ON_Pin|output_OFF_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : ONOFF_BUTTON_Pin */
+  GPIO_InitStruct.Pin = ONOFF_BUTTON_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(ONOFF_BUTTON_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : select_Pin */
   GPIO_InitStruct.Pin = select_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(select_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : output_ON_Pin output_OFF_Pin */
+  GPIO_InitStruct.Pin = output_ON_Pin|output_OFF_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
