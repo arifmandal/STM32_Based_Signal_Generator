@@ -25,4 +25,5 @@ void handleMenuNavigation(void);
 void setFrequency(void);
 void setDutyCycle(void);
 void showAbout(void);
+void showInfo(void);
 #endif /* INC_MENU_H_ */

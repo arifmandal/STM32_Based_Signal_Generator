@@ -39,7 +39,7 @@ void printMenuItems(uint8_t menuCount) {
 void handleMenuNavigation() {
 
 	printMenuItems(MAIN_MENU_ITEM_COUNT);
-	HAL_Delay(50);
+	HAL_Delay(75);
 
 	encoderValue = (TIM1->CNT) >> 3;
 	selectedMenuItem = encoderValue % MAIN_MENU_ITEM_COUNT;
@@ -50,6 +50,12 @@ void handleMenuNavigation() {
 		selectedMenuItem = 0;
 		TIM1->CNT = 0;
 		while (1) {
+			uint8_t outputStatus = HAL_GPIO_ReadPin(output_ON_GPIO_Port, output_ON_Pin);
+
+			if (outputStatus) {
+				showInfo();
+				break;
+			}
 			setFrequency();
 			HAL_Delay(150);
 			if (SELECT_CLICK) {
@@ -66,6 +72,11 @@ void handleMenuNavigation() {
 		selectedMenuItem = 0;
 		TIM1->CNT = 0;
 		while (1) {
+			uint8_t outputStatus = HAL_GPIO_ReadPin(output_ON_GPIO_Port, output_ON_Pin);
+			if (outputStatus) {
+				showInfo();
+				break;
+			}
 			setDutyCycle();
 			HAL_Delay(150);
 			if (SELECT_CLICK) {
@@ -158,5 +169,15 @@ void showAbout() {
 	ssd1306_SetCursor(40, 50);
 	ssd1306_WriteString("v1.0", Font_7x10, White);
 	ssd1306_UpdateScreen();
+
+}
+
+void showInfo(){
+
+	ssd1306_Fill(Black);
+	ssd1306_SetCursor(20, 10);
+	ssd1306_WriteString("Output ON", Font_7x10, White);
+	ssd1306_UpdateScreen();
+	HAL_Delay(2000);
 
 }

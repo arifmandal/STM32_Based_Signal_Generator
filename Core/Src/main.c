@@ -66,6 +66,27 @@ static void MX_TIM1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void programInitialization(){
+	pwmChannelStart(&htim4, TIM_CHANNEL_1);
+	setPWMFreqDuty(1000, 50);
+	ssd1306_Init();
+	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
+	HAL_GPIO_WritePin(output_OFF_GPIO_Port, output_OFF_Pin, 1);
+	HAL_GPIO_WritePin(output_ON_GPIO_Port, output_ON_Pin, 0);
+	pwmChannelStop(&htim4, TIM_CHANNEL_1);
+}
+
+void programStartMessage(){
+
+	ssd1306_Fill(Black);
+	ssd1306_SetCursor(20, 10);
+	ssd1306_WriteString("STM32 Based", Font_7x10, White);
+	ssd1306_SetCursor(10, 30);
+	ssd1306_WriteString("Signal Generator", Font_7x10, White);
+	ssd1306_UpdateScreen();
+	HAL_Delay(3000);
+
+}
 
 /* USER CODE END 0 */
 
@@ -102,16 +123,8 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
-
-  pwmChannelStart(&htim4, TIM_CHANNEL_1);
-  setPWMFreqDuty(1000, 50);
-  ssd1306_Init();
-  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
-  HAL_GPIO_WritePin(output_OFF_GPIO_Port, output_OFF_Pin, 1);
-  HAL_GPIO_WritePin(output_ON_GPIO_Port, output_ON_Pin, 0);
-  pwmChannelStop(&htim4, TIM_CHANNEL_1);
-
-
+  programInitialization();
+  programStartMessage();
   /* USER CODE END 2 */
 
   /* Infinite loop */
